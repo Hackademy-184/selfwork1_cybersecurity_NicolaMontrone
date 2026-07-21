@@ -33,28 +33,6 @@ class UserController extends Controller
 
         return back()->with('message','User updated');
     }
-    public function changeEmail(Request $request){
-        
-        if(!$user = Auth::user())
-        return response()->json(['message' => 'Forbidden Operation'], 403);
-        
-        $user->email = $request->email;
-        $user->save();
-        
-        return back()->with('message','Changed successfully');
-    }
-    
-    public function changeName(Request $request)
-    {
-        if(!$user = Auth::user())
-        return response()->json(['message' => 'Forbidden Operation'], 403);
-        
-        $user->name = $request->name;
-        $user->save();
-        
-        return back()->with('message','Changed successfully');
-    }
-    
     public function changeImg(Request $request)
     {
         if(!$user = Auth::user()){
@@ -109,6 +87,11 @@ class UserController extends Controller
 
         abort_unless(array_key_exists($document, $documents), 404);
 
-        return response()->download(storage_path('app/private/'.$documents[$document]));
+        $file = $documents[$document];
+        $disk = Storage::disk('local');
+
+        abort_unless($disk->exists($file), 404);
+
+        return $disk->download($file, $file);
     }
 }

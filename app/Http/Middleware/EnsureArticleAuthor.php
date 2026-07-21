@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Article;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,8 +13,9 @@ class EnsureArticleAuthor
     {
         $article = $request->route('article');
 
-        if (!$article || $request->user()?->id !== $article->user_id) {
-            return redirect()->route('articles.show', $article)->with('message', 'Not authorized');
+        if (! $article instanceof Article
+            || (int) $request->user()?->getAuthIdentifier() !== (int) $article->user_id) {
+            return back()->with('errors', 'Not authorized');
         }
 
         return $next($request);

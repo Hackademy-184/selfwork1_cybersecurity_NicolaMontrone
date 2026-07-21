@@ -12,8 +12,7 @@ class ArticleController extends Controller
 {
     public function index(Request $request, HtmlFilterService $htmlFilterService)
     {
-        // UNSECURE
-        $articles = Article::latest()->where('published',true)->take(6)->get();
+        $articles = Article::latest()->where('published', true)->take(6)->get();
 
         // SECURE
         //$articles = $htmlFilterService->filterHtmlCollectionByField($articles,'content');
@@ -25,21 +24,26 @@ class ArticleController extends Controller
     }
 
     public function search(Request $request){
-        
-        // UNSECURE
-        $articles = Article::whereRaw("title like '%{$request->search}%'")->get();
+        $search = $request->string('search')->trim()->value();
 
-        // SECURE
-        // $articles = Article::where('title', 'LIKE', "%{$request->search}%")
-        //                     ->orWhere('content', 'LIKE', "%{$request->search}%")
-        // ->get();
+        $articles = Article::query()
+            ->where('published', true)
+            ->where(function ($query) use ($search) {
+                $query->where('title', 'LIKE', "%{$search}%")
+                    ->orWhere('content', 'LIKE', "%{$search}%");
+            })
+            ->get();
         
         return view('articles.index',compact('articles'));
     }
     
-    // UNSECURE
     public function show(Article $article, Request $request)
     {
+        $canViewUnpublished = $request->user()?->isAdmin()
+            || (int) $request->user()?->getAuthIdentifier() === (int) $article->user_id;
+
+        abort_unless($article->published || $canViewUnpublished, 404);
+
         if ($request->wantsJson()) {
             return response()->json($article);
         }
@@ -68,7 +72,6 @@ class ArticleController extends Controller
         $articleData = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
-            'published' => ['sometimes', 'boolean'],
         ]);
 
         // SECURE
@@ -87,15 +90,22 @@ class ArticleController extends Controller
 
     public function edit(Article $article)
     {
+        if (! $this->isAuthor($article)) {
+            return back()->with('errors', 'Not authorized');
+        }
+
         return view('articles.edit',compact('article'));
     }
 
     public function update(Request $request, Article $article/*,HtmlFilterService $htmlFilterService*/)
     {
+        if (! $this->isAuthor($article)) {
+            return back()->with('errors', 'Not authorized');
+        }
+
         $articleData = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
-            'published' => ['sometimes', 'boolean'],
         ]);
 
         // SECURE
@@ -112,6 +122,10 @@ class ArticleController extends Controller
     
     public function destroy(Article $article, Request $request)
     {
+        if (! $this->isAuthor($article)) {
+            return back()->with('errors', 'Not authorized');
+        }
+
         $article->delete();
         
         if ($request->wantsJson()) {
@@ -119,5 +133,10 @@ class ArticleController extends Controller
         }
         
         return redirect()->route('articles.index')->with('message','Article deleted successfully');
+    }
+
+    private function isAuthor(Article $article): bool
+    {
+        return (int) Auth::id() === (int) $article->user_id;
     }
 }

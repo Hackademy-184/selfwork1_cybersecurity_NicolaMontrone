@@ -36,8 +36,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile',[UserController::class,'profile'])->name('profile');
 
     Route::patch('/profile',[UserController::class,'update'])->name('users.update');
-    Route::post('/users/name/change',[UserController::class,'changeName'])->name('change.name');
-    Route::get('/users/email/change',[UserController::class,'changeEmail'])->name('change.email');
     Route::post('/users/img/change',[UserController::class,'changeImg'])->name('change.img');
 
     Route::get('/documents/{document}/download', [UserController::class,'download'])
