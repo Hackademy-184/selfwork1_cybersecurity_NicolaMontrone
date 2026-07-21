@@ -65,15 +65,16 @@ class ArticleController extends Controller
     
     public function store(Request $request/*,HtmlFilterService $htmlFilterService*/)
     {
-        // UNSECURE
-        $articleData = $request->all();
+        $articleData = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+            'published' => ['sometimes', 'boolean'],
+        ]);
 
         // SECURE
         //$articleData['content'] = $htmlFilterService->filterHtml($articleData['content']);
-        
-        if(!key_exists('user_id',$articleData)){
-            $articleData['user_id']= Auth::id();
-        }
+
+        $articleData['user_id']= Auth::id();
         
         $article = Article::create($articleData);
         
@@ -91,8 +92,11 @@ class ArticleController extends Controller
 
     public function update(Request $request, Article $article/*,HtmlFilterService $htmlFilterService*/)
     {
-        // UNSECURE
-        $articleData = $request->all();
+        $articleData = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+            'published' => ['sometimes', 'boolean'],
+        ]);
 
         // SECURE
         //$articleData['content'] = $htmlFilterService->filterHtml($articleData['content']);
@@ -108,11 +112,6 @@ class ArticleController extends Controller
     
     public function destroy(Article $article, Request $request)
     {
-        // SECURE
-        // if(Auth::id() !== $article->user_id){
-        //     return redirect()->route('articles.show', $article)->with('message','Not authorized');
-        // }
-        
         $article->delete();
         
         if ($request->wantsJson()) {

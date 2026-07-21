@@ -6,31 +6,30 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image as Image;
-
 
 class UserController extends Controller
 {
-    // UNSECURE
-    public function show($id)
-	{
-		$user = User::findOrFail($id);
+    public function profile()
+    {
+        if (!$user = Auth::user()) {
+            return response()->json(['message' => 'Forbidden Operation'], 403);
+        }
 
-        return view('auth.profile',compact('user'));
-	}
+        return view('auth.profile', compact('user'));
+    }
 
-    // SECURE
-    // public function profile(){
-    //     if(!$user = Auth::user())
-    //     return response()->json(['message' => 'Forbidden Operation'], 403);
-        
-    //     return view('auth.profile',compact('user'));
-    // }
+    public function update(Request $request)
+    {
+        if (!$user = Auth::user()) {
+            return response()->json(['message' => 'Forbidden Operation'], 403);
+        }
 
-    public function update(Request $request, $id){
-        $user = User::find($id);
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+        ]);
 
-        $user->update($request->all());
+        $user->update($validated);
 
         return back()->with('message','User updated');
     }
@@ -101,7 +100,15 @@ class UserController extends Controller
         return redirect()->back()->with('message','Image updated');
     }
 
-    public function download(Request $request) {
-        return response()->download(storage_path('app/private/'.$request->get('filename')));
+    public function download(string $document)
+    {
+        $documents = [
+            'privacy' => 'privacy.pdf',
+            'cookie-policy' => 'cookie-policy.pdf',
+        ];
+
+        abort_unless(array_key_exists($document, $documents), 404);
+
+        return response()->download(storage_path('app/private/'.$documents[$document]));
     }
 }

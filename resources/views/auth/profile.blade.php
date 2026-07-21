@@ -57,8 +57,14 @@
                       @endif
                     </td>
                     <td>
-                      <a href="{{route('articles.edit',$article->id)}}" class="btn btn-sm btn-outline-warning me-2" title="Edit"><i class="bi bi-pencil"></i></a>
-                      <a href="{{route('articles.destroy',$article->id)}}" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
+                      @if(auth()->id() === $article->user_id)
+                        <a href="{{route('articles.edit',$article)}}" class="btn btn-sm btn-outline-warning me-2" title="Edit"><i class="bi bi-pencil"></i></a>
+                        <form action="{{route('articles.destroy',$article)}}" method="POST" class="d-inline">
+                          @csrf
+                          @method('DELETE')
+                          <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                        </form>
+                      @endif
                     </td>
                   </tr>
                 @endforeach
@@ -69,7 +75,7 @@
         <!-- Settings Section -->
         <div class="card shadow-sm mb-5 border-0 p-4">
           <h3 class="fw-semibold mb-4"><i class="bi bi-gear me-2"></i>Settings</h3>
-          <form method="POST" action="{{route('users.update',$user->id)}}">
+          <form method="POST" action="{{route('users.update')}}">
             @csrf
             @method('PATCH')
             <div class="mb-4">
@@ -86,8 +92,8 @@
         <!-- Documents Section -->
         <div class="card shadow-sm border-0 p-4 mb-4">
           <h3 class="fw-semibold mb-3"><i class="bi bi-file-earmark-text me-2"></i>Documents</h3>
-          <a href="{{route('download','filename=privacy.pdf')}}" class="d-block mb-2 text-decoration-none text-info fw-semibold"><i class="bi bi-file-earmark-pdf me-2"></i>Privacy policy</a>
-          <a href="{{route('download','filename=cookie-policy.pdf')}}" class="d-block text-decoration-none text-info fw-semibold"><i class="bi bi-file-earmark-pdf me-2"></i>Cookie policy</a>
+          <a href="{{route('download','privacy')}}" class="d-block mb-2 text-decoration-none text-info fw-semibold"><i class="bi bi-file-earmark-pdf me-2"></i>Privacy policy</a>
+          <a href="{{route('download','cookie-policy')}}" class="d-block text-decoration-none text-info fw-semibold"><i class="bi bi-file-earmark-pdf me-2"></i>Cookie policy</a>
         </div>
       </div>
     </div>

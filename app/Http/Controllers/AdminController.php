@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Article;
-use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -27,27 +26,17 @@ class AdminController extends Controller
     }
     
     public function toggleArticleStatus($id) {
-        // SECURE
-        // if(!Auth::user()->isAdmin()){
-        //     return back()->withMessage("Operation not permitted");
-        // }
-        
-        $article = Article::find($id);
+        $article = Article::findOrFail($id);
         $article->published = !$article->published;
         $article->save();
-        return back();
+        return back()->with('message', 'Article status updated');
     }
 
 	public function toggleUsersAdmin($id)
 	{
-        // SECURE
-        // if(!Auth::user()->isAdmin()){
-        //     return back()->withMessage("Operation not permitted");
-        // }
-        // UNSECURE
-		$user = User::find($id);
+		$user = User::findOrFail($id);
         $user->is_admin = !$user->is_admin;
         $user->save();
-        return back();
+        return back()->with('message', 'User role updated');
 	}
 }

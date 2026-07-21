@@ -55,7 +55,7 @@
             <span class="d-none d-lg-inline">Hi, {{$user->name}}</span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end custom-dropdown">
-            <li><a class="dropdown-item" href="{{route('profile',auth()->id())}}"><i class="bi bi-person me-2"></i>Profile</a></li>
+            <li><a class="dropdown-item" href="{{route('profile')}}"><i class="bi bi-person me-2"></i>Profile</a></li>
             @if(auth()->user()->isAdmin())
             <li><a class="dropdown-item" href="{{route('dashboard')}}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
             @endif

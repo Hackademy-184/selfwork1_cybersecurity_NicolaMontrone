@@ -28,33 +28,29 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/articles/create', [ArticleController::class, 'create'])->name('articles.create');
     Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
-    Route::get('/articles/{article}/edit', [ArticleController::class, 'edit'])->name('articles.edit');
-    Route::put('/articles/{article}', [ArticleController::class, 'update'])->name('articles.update');
-    Route::get('/articles/{article}/delete', [ArticleController::class, 'destroy'])->name('articles.destroy');
-    // UNSECURE
-    Route::get('/users/{id}',[UserController::class,'show'])->name('profile');
-    // SECURE
-    // Route::get('/profile',[UserController::class,'profile'])->name('profile');
+    Route::middleware(['article.author'])->group(function () {
+        Route::get('/articles/{article}/edit', [ArticleController::class, 'edit'])->name('articles.edit');
+        Route::put('/articles/{article}', [ArticleController::class, 'update'])->name('articles.update');
+        Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])->name('articles.destroy');
+    });
+    Route::get('/profile',[UserController::class,'profile'])->name('profile');
 
-    Route::patch('/users/{id}/update',[UserController::class,'update'])->name('users.update');
+    Route::patch('/profile',[UserController::class,'update'])->name('users.update');
     Route::post('/users/name/change',[UserController::class,'changeName'])->name('change.name');
     Route::get('/users/email/change',[UserController::class,'changeEmail'])->name('change.email');
     Route::post('/users/img/change',[UserController::class,'changeImg'])->name('change.img');
 
-    Route::get('/download-privacy', [UserController::class,'download'])->name('download');
+    Route::get('/documents/{document}/download', [UserController::class,'download'])
+        ->whereIn('document', ['privacy', 'cookie-policy'])
+        ->name('download');
     
-    // SECURE
-    //Route::middleware(['admin'])->prefix('dashboard')->group(function () {
-    // UNSECURE
-    Route::prefix('dashboard')->group(function () {
+    Route::middleware(['admin'])->prefix('dashboard')->group(function () {
         Route::get('/', [AdminController::class,'dashboard'])->name('dashboard');
         Route::get('/articles', [AdminController::class,'articles'])->name('admin.articles');
         Route::get('/users', [AdminController::class,'users'])->name('admin.users');
         
-        Route::get('/users/{id}/toggle', [AdminController::class,'toggleUsersAdmin'])->name('admin.users.toggle');
-        Route::get('articles/{id}/toggle',[AdminController::class,'toggleArticleStatus'])->name('admin.articles.toggle');
-        // Route::post('/users/{id}/toggle', [AdminController::class,'toggleUsersAdmin'])->name('admin.users.toggle');
-        // Route::post('/articles/{id}/toggle',[AdminController::class,'toggleArticleStatus'])->name('admin.articles.toggle');
+        Route::post('/users/{id}/toggle', [AdminController::class,'toggleUsersAdmin'])->name('admin.users.toggle');
+        Route::post('/articles/{id}/toggle',[AdminController::class,'toggleArticleStatus'])->name('admin.articles.toggle');
     });
     // UNSECURE
     Route::post('/articles/{articleId}/comments', [CommentController::class, 'store'])->name('comments.store');

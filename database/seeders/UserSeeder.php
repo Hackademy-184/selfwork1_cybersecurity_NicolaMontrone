@@ -36,17 +36,26 @@ class UserSeeder extends Seeder
                 'is_admin' => false,
                 'avatar' => 'https://ui-avatars.com/api/?name=Regular+User&background=9B59B6&color=fff',
             ],
+            [
+                'name' => 'Hacker User',
+                'email' => 'hacker@example.com',
+                'password' => 'password',
+                'is_admin' => false,
+                'avatar' => 'https://ui-avatars.com/api/?name=Hacker+User&background=E74C3C&color=fff',
+            ],
         ];
 
         foreach ($testUsers as $user) {
-            User::create([
-                'name' => $user['name'],
-                'email' => $user['email'],
-                'password' => Hash::make($user['password']),
-                'is_admin' => $user['is_admin'],
-                'avatar' => $user['avatar'],
-                'email_verified_at' => now(),
-            ]);
+            User::updateOrCreate(
+                ['email' => $user['email']],
+                [
+                    'name' => $user['name'],
+                    'password' => Hash::make($user['password']),
+                    'is_admin' => $user['is_admin'],
+                    'avatar' => $user['avatar'],
+                    'email_verified_at' => now(),
+                ]
+            );
         }
 
         // Create additional random users

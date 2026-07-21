@@ -13,10 +13,16 @@
             </div>
           </div>
           <div class="card-body bg-white p-4">
-            <div class="d-flex mb-3 gap-2">
-              <a href="{{route('articles.edit',$article->id)}}" class="btn btn-warning rounded-pill px-4 fw-semibold"><i class="bi bi-pencil me-1"></i> Edit</a>
-              <a href="{{route('articles.destroy',$article->id)}}" class="btn btn-danger rounded-pill px-4 fw-semibold"><i class="bi bi-trash me-1"></i> Delete</a>
-            </div>
+            @if(auth()->id() === $article->user_id)
+              <div class="d-flex mb-3 gap-2">
+                <a href="{{route('articles.edit',$article)}}" class="btn btn-warning rounded-pill px-4 fw-semibold"><i class="bi bi-pencil me-1"></i> Edit</a>
+                <form action="{{route('articles.destroy',$article)}}" method="POST">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="btn btn-danger rounded-pill px-4 fw-semibold"><i class="bi bi-trash me-1"></i> Delete</button>
+                </form>
+              </div>
+            @endif
             <div class="text-justify mb-4 fs-5 lh-lg">
               {!!$article->content !!}
             </div>
