@@ -23,18 +23,20 @@ class ArticleController extends Controller
         return view('articles.index', compact('articles'));
     }
 
-    public function search(Request $request){
-        $search = $request->string('search')->trim()->value();
+    // SECURE: protects against SQL Injection through prepared statements.
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
 
         $articles = Article::query()
             ->where('published', true)
-            ->where(function ($query) use ($search) {
-                $query->where('title', 'LIKE', "%{$search}%")
-                    ->orWhere('content', 'LIKE', "%{$search}%");
+            ->where(function ($query) use ($searchTerm) {
+                $query->where('title', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('content', 'LIKE', "%{$searchTerm}%");
             })
             ->get();
         
-        return view('articles.index',compact('articles'));
+        return view('articles.index', compact('articles'));
     }
     
     public function show(Article $article, Request $request)
