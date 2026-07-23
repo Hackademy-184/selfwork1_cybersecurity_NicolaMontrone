@@ -52,10 +52,10 @@ class UserController extends Controller
         // calculate hash
 
         // UNSECURE with md5
-        $newImageHash = md5_file($newImage);
+        // $newImageHash = md5_file($newImage);
 
         // SECURE with sha56
-        // $newImageHash = hash_file('sha256', $newImage);
+        $newImageHash = hash_file('sha256', $newImage);
     
         // compare hash
         if($newImageHash == $user->avatar){
