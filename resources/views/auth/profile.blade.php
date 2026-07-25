@@ -92,6 +92,23 @@
         <!-- Documents Section -->
         <div class="card shadow-sm border-0 p-4 mb-4">
           <h3 class="fw-semibold mb-3"><i class="bi bi-file-earmark-text me-2"></i>Documents</h3>
+          <form method="POST" action="{{route('files.upload')}}" enctype="multipart/form-data" class="mb-4">
+            @csrf
+            <label for="document" class="form-label fw-semibold">Upload a document</label>
+            <div class="input-group">
+              <input id="document" type="file" class="form-control" name="file" accept=".jpg,.jpeg,.png,.gif,.pdf" required>
+              <button type="submit" class="btn btn-primary">Upload</button>
+            </div>
+          </form>
+          @foreach ($files as $file)
+            <a href="{{route('download.private', $file->uid)}}" class="d-block mb-2 text-decoration-none text-info fw-semibold">
+              <i class="bi bi-file-earmark-arrow-down me-2"></i>{{$file->name}}
+            </a>
+          @endforeach
+          @if ($files->isEmpty())
+            <p class="text-muted">No private files uploaded.</p>
+          @endif
+          <hr>
           <a href="{{route('download','privacy')}}" class="d-block mb-2 text-decoration-none text-info fw-semibold"><i class="bi bi-file-earmark-pdf me-2"></i>Privacy policy</a>
           <a href="{{route('download','cookie-policy')}}" class="d-block text-decoration-none text-info fw-semibold"><i class="bi bi-file-earmark-pdf me-2"></i>Cookie policy</a>
         </div>

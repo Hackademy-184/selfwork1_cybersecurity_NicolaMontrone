@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,22 +32,25 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/articles/{article}', [ArticleController::class, 'update'])->name('articles.update');
         Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])->name('articles.destroy');
     });
-    Route::get('/profile',[UserController::class,'profile'])->name('profile');
+    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 
-    Route::patch('/profile',[UserController::class,'update'])->name('users.update');
-    Route::post('/users/img/change',[UserController::class,'changeImg'])->name('change.img');
+    Route::patch('/profile', [UserController::class, 'update'])->name('users.update');
+    Route::post('/users/img/change', [UserController::class, 'changeImg'])->name('change.img');
+    Route::post('/profile/files', [UserController::class, 'upload'])->name('files.upload');
+    Route::get('/download/{file}', [UserController::class, 'downloadPrivateFile'])
+        ->name('download.private');
 
-    Route::get('/documents/{document}/download', [UserController::class,'download'])
+    Route::get('/documents/{document}/download', [UserController::class, 'download'])
         ->whereIn('document', ['privacy', 'cookie-policy'])
         ->name('download');
-    
+
     Route::middleware(['admin'])->prefix('dashboard')->group(function () {
-        Route::get('/', [AdminController::class,'dashboard'])->name('dashboard');
-        Route::get('/articles', [AdminController::class,'articles'])->name('admin.articles');
-        Route::get('/users', [AdminController::class,'users'])->name('admin.users');
-        
-        Route::post('/users/{id}/toggle', [AdminController::class,'toggleUsersAdmin'])->name('admin.users.toggle');
-        Route::post('/articles/{id}/toggle',[AdminController::class,'toggleArticleStatus'])->name('admin.articles.toggle');
+        Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::get('/articles', [AdminController::class, 'articles'])->name('admin.articles');
+        Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+
+        Route::post('/users/{id}/toggle', [AdminController::class, 'toggleUsersAdmin'])->name('admin.users.toggle');
+        Route::post('/articles/{id}/toggle', [AdminController::class, 'toggleArticleStatus'])->name('admin.articles.toggle');
     });
     Route::post('/articles/{articleId}/comments', [CommentController::class, 'store'])
         ->middleware(['block.suspicious'])
