@@ -50,11 +50,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/users/{id}/toggle', [AdminController::class,'toggleUsersAdmin'])->name('admin.users.toggle');
         Route::post('/articles/{id}/toggle',[AdminController::class,'toggleArticleStatus'])->name('admin.articles.toggle');
     });
-    // UNSECURE
-    Route::post('/articles/{articleId}/comments', [CommentController::class, 'store'])->name('comments.store');
-    
-    // SECURE
-    // Route::post('/articles/{articleId}/comments', [CommentController::class, 'store'])->middleware(['block.suspicious'])->name('comments.store');
+    Route::post('/articles/{articleId}/comments', [CommentController::class, 'store'])
+        ->middleware(['block.suspicious'])
+        ->name('comments.store');
 });
 
 Route::get('/articles', [ArticleController::class, 'index'])->name('articles.index');

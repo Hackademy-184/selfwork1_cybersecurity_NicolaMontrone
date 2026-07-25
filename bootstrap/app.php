@@ -19,6 +19,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'article.author' => \App\Http\Middleware\EnsureArticleAuthor::class,
+            'block.suspicious' => \App\Http\Middleware\BlockSuspiciousIPs::class,
+        ]);
+        $middleware->validateCsrfTokens(
+            // except: ['stripe/*']
+        );
+        $middleware->web(append: [
+            //
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
