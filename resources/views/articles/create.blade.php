@@ -21,6 +21,7 @@
                 <div id="editor" style="height: 200px;"></div>
                 <input type="hidden" name="content" id="content-input">
               </div>
+              <livewire:article-image-preview />
               <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold"><i class="bi bi-save me-1"></i>Save</button>
               </div>
